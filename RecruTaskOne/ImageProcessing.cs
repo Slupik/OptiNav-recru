@@ -6,7 +6,24 @@ using System.Threading.Tasks;
 
 namespace RecruTaskOne
 {
-    public class ImageProcessing
+    public interface IImageProcessing
     {
+
     }
+
+    public abstract class ImageProcessing : IImageProcessing
+    {
+
+    }
+
+    public class SynchronousImageProcessing : ImageProcessing
+    {
+
+    }
+
+    public class AsynchronousImageProcessing : ImageProcessing
+    {
+
+    }
+
 }
