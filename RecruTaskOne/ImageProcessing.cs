@@ -79,16 +79,15 @@ namespace RecruTaskOne
                 throw new SourceImageNotFoundException();
             }
             Bitmap source = new Bitmap(oryginal);
-            Bitmap output = new Bitmap(source.Width, source.Height);
             for (int x = 0; x < source.Width; x++)
             {
                 for (int y = 0; y < source.Height; y++)
                 {
                     Color sourceColor = source.GetPixel(x, y);
-                    output.SetPixel(x, y, ProcessPixel(sourceColor));
+                    source.SetPixel(x, y, ProcessPixel(sourceColor));
                 }
             }
-            processed = output;
+            processed = source;
         }
     }
 
@@ -102,54 +101,44 @@ namespace RecruTaskOne
                 throw new SourceImageNotFoundException();
             }
             Bitmap source = new Bitmap(oryginal);
-            Bitmap dest = new Bitmap(source.Width, source.Height);
 
             unsafe
             {
-                BitmapData srcData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadWrite, source.PixelFormat);
-                BitmapData destData = dest.LockBits(new Rectangle(0, 0, dest.Width, dest.Height), ImageLockMode.ReadWrite, dest.PixelFormat);
+                BitmapData imageData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadWrite, source.PixelFormat);
 
                 int bytesPerPixel = Image.GetPixelFormatSize(source.PixelFormat) / 8;
-                int widthInBytes = srcData.Width * bytesPerPixel;
-                int heightInPixels = srcData.Height;
+                int widthInBytes = imageData.Width * bytesPerPixel;
+                int heightInPixels = imageData.Height;
 
-                byte* srcStartPointer = (byte*)srcData.Scan0;
-                byte* destStartPointer = (byte*)destData.Scan0;
+                byte* startPointer = (byte*)imageData.Scan0;
 
                 Parallel.For(0, heightInPixels, y =>
                 {
-                    byte* srcCurrentLine = srcStartPointer + (y * srcData.Stride);
-                    byte* destCurrentLine = destStartPointer + (y * destData.Stride);
+                    byte* srcCurrentLine = startPointer + (y * imageData.Stride);
                     for (int x = 0; x < widthInBytes; x += bytesPerPixel)
                     {
                         ChangePixel(
                                     ref srcCurrentLine[x + 2],
                                     ref srcCurrentLine[x + 1],
-                                    ref srcCurrentLine[x],
-                                    ref destCurrentLine[x + 2],
-                                    ref destCurrentLine[x + 1],
-                                    ref destCurrentLine[x]
+                                    ref srcCurrentLine[x]
                             );
-                        destCurrentLine[x + 3] = (byte)255;
                     }
                 });
-                source.UnlockBits(srcData);
-                dest.UnlockBits(destData);
+                source.UnlockBits(imageData);
             }
 
-            processed = dest;
+            processed = source;
         }
 
-        private void ChangePixel(ref byte redSrc, ref byte greenSrc, ref byte blueSrc,
-            ref byte red, ref byte green, ref byte blue)
+        private void ChangePixel(ref byte red, ref byte green, ref byte blue)
         {
-            if (redSrc >= greenSrc && redSrc >= blueSrc)
+            if (red >= green && red >= blue)
             {
                 red = (byte)255;
                 green = (byte)0;
                 blue = (byte)0;
             }
-            else if (greenSrc >= redSrc && greenSrc >= blueSrc)
+            else if (green >= red && green >= blue)
             {
                 red = (byte)0;
                 green = (byte)255;
