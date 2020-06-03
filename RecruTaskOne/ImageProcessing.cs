@@ -44,6 +44,19 @@ namespace RecruTaskOne
 
         public abstract void Process();
 
+        protected Color ProcessPixel(Color pixel)
+        {
+            if (pixel.R >= pixel.G && pixel.R >= pixel.B)
+            {
+                return Color.FromArgb(pixel.A, 255, 0, 0);
+            }
+            if (pixel.G >= pixel.R && pixel.G >= pixel.B)
+            {
+                return Color.FromArgb(pixel.A, 0, 255, 0);
+            }
+            return Color.FromArgb(pixel.A, 0, 0, 255);
+        }
+
         public void SaveProcessed(string outputPath)
         {
             if(processed == null)
@@ -59,10 +72,21 @@ namespace RecruTaskOne
 
         public override void Process()
         {
-            if (processed == null)
+            if (oryginal == null)
             {
-                throw new NotProcessedYetException();
+                throw new SourceImageNotFoundException();
             }
+            Bitmap source = new Bitmap(oryginal);
+            Bitmap output = new Bitmap(source.Width, source.Height);
+            for (int x = 0; x < source.Width; x++)
+            {
+                for (int y = 0; y < source.Height; y++)
+                {
+                    Color sourceColor = source.GetPixel(x, y);
+                    output.SetPixel(x, y, ProcessPixel(sourceColor));
+                }
+            }
+            processed = output;
         }
     }
 
@@ -71,9 +95,9 @@ namespace RecruTaskOne
 
         public override void Process()
         {
-            if (processed == null)
+            if (oryginal == null)
             {
-                throw new NotProcessedYetException();
+                throw new SourceImageNotFoundException();
             }
         }
 
