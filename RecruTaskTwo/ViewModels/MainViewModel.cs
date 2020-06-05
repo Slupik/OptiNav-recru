@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using Microsoft.Win32;
 using RecruTaskOne;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,14 @@ namespace RecruTaskTwo.ViewModels
             ProcessingTime = "30";
             ImagePath = "img path";
             TimeInfoContainerIsVisible = true;
-            ImageIsSelected = true;
+
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                ImagePath = openFileDialog.FileName;
+                AsynchronousProcessor.LoadImage(openFileDialog.FileName);
+                ImageIsSelected = true;
+            }
         }
     }
 }
