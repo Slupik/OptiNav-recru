@@ -19,5 +19,16 @@
                 </Grid>
             </TabItem>
         </TabControl>
+        <Grid Margin="0,10,10,10" HorizontalAlignment="Right" Width="371">
+            <Button Content="Wczytaj obraz" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="102" Click="Button_Click"/>
+            <Label Content="Ścieżka:" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top"/>
+            <TextBox Margin="66,39,10,0" TextWrapping="Wrap" Text="???" TextChanged="TextBox_TextChanged" Height="23" VerticalAlignment="Top"/>
+            <Button Content="Przetwórz obraz" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" Width="102"/>
+            <WrapPanel HorizontalAlignment="Left" Height="81" Margin="10,92,0,0" VerticalAlignment="Top" Width="351">
+                <Label Content="Czas przetwarzania:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Label Content="???" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Label Content="ms" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </WrapPanel>
+        </Grid>
     </Grid>
 </Window>
