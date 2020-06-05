@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using RecruTaskOne;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,9 @@ namespace RecruTaskTwo.ViewModels
 {
     public class MainViewModel : Screen
     {
+        private readonly IImageProcessing AsynchronousProcessor = new AsynchronousImageProcessing();
+        private readonly IImageProcessing SynchronousProcessor = new SynchronzousImageProcessing();
+
         private bool _timeInfoContainerIsVisible = false;
         public bool TimeInfoContainerIsVisible
         {
