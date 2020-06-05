@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using RecruTaskOne;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,17 +61,26 @@ namespace RecruTaskTwo.ViewModels
 
         public void LoadImage()
         {
-            ProcessingTime = "30";
-            ImagePath = "img path";
-            TimeInfoContainerIsVisible = true;
-
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
             {
                 ImagePath = openFileDialog.FileName;
-                AsynchronousProcessor.LoadImage(openFileDialog.FileName);
+                SynchronousProcessor.LoadImage(openFileDialog.FileName);
                 ImageIsSelected = true;
             }
+        }
+
+        public void ProcessImage()
+        {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+            SynchronousProcessor.ToMainColors();
+            stopWatch.Stop();
+
+            TimeSpan ts = stopWatch.Elapsed;
+            ProcessingTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
+            TimeInfoContainerIsVisible = true;
         }
     }
 }
