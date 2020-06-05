@@ -22,11 +22,18 @@
             </TabItem>
         </TabControl>
         <Grid Margin="0,10,10,10" HorizontalAlignment="Right" Width="371">
-            <Button x:Name="LoadImage" IsEnabled="{Binding AllowToInteract}" Content="Wczytaj obraz" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="102"/>
-            <Label Content="Ścieżka:" Visibility="{Binding ImageIsSelected, Converter={StaticResource BoolToVisibility}}" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top"/>
-            <TextBox x:Name="ImagePath" Visibility="{Binding ImageIsSelected, Converter={StaticResource BoolToVisibility}}" Margin="66,39,10,0" TextWrapping="Wrap" Text="???" Height="23" VerticalAlignment="Top" IsReadOnly="True"/>
-            <Button x:Name="ProcessImage" IsEnabled="{Binding AllowToInteract}" Visibility="{Binding ImageIsSelected, Converter={StaticResource BoolToVisibility}}" Content="Przetwórz obraz" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" Width="102"/>
-            <WrapPanel x:Name="TimeInfoContainer" Visibility="{Binding TimeInfoContainerIsVisible, Converter={StaticResource BoolToVisibility}}" HorizontalAlignment="Left" Height="81" Margin="10,92,0,0" VerticalAlignment="Top" Width="351">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Button x:Name="LoadImage" IsEnabled="{Binding AllowToInteract}" Grid.Row="0" Content="Wczytaj obraz" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="102"/>
+            <Label Content="Ścieżka:" Visibility="{Binding ImageIsSelected, Converter={StaticResource BoolToVisibility}}" Grid.Row="1" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+            <TextBox x:Name="ImagePath" Visibility="{Binding ImageIsSelected, Converter={StaticResource BoolToVisibility}}" Grid.Row="1" Margin="66,14,10,0" TextWrapping="Wrap" Text="???" VerticalAlignment="Top" IsReadOnly="True"/>
+            <Button x:Name="ProcessImage" IsEnabled="{Binding AllowToInteract}" Visibility="{Binding ImageIsSelected, Converter={StaticResource BoolToVisibility}}" Grid.Row="2" Content="Przetwórz obraz" HorizontalAlignment="Left" Margin="10,10,0,0" Width="102" Height="20" VerticalAlignment="Top"/>
+            <WrapPanel x:Name="TimeInfoContainer" Visibility="{Binding TimeInfoContainerIsVisible, Converter={StaticResource BoolToVisibility}}" Grid.Row="3" HorizontalAlignment="Left" Margin="10,0,0,18" Width="351">
                 <Label Content="Czas przetwarzania:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 <Label x:Name="ProcessingTime" Content="???" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 <Label Content="ms" HorizontalAlignment="Left" VerticalAlignment="Top"/>
