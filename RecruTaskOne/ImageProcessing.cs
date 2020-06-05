@@ -3,8 +3,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading.Tasks;
 
-namespace RecruTaskOne
+namespace TaskLibrary
 {
+
     public interface IImageProcessing
     {
         void LoadImage(string path);
@@ -27,8 +28,25 @@ namespace RecruTaskOne
 
     public abstract class ImageProcessing : IImageProcessing
     {
-        protected Image oryginal = null;
-        protected Image processed = null;
+        protected Bitmap _oryginal = null;
+        public Bitmap Oryginal
+        {
+            get
+            {
+                return _oryginal;
+            }
+        }
+
+        protected Bitmap _result = null;
+        public Bitmap Result
+        {
+            get
+            {
+                return _result;
+            }
+        }
+
+        protected bool processed = false;
 
         public void LoadImage(string path)
         {
@@ -37,7 +55,12 @@ namespace RecruTaskOne
 
         public void LoadImage(Image image)
         {
-            oryginal = image;
+            if (image is Bitmap bitmap)
+                _oryginal = bitmap;
+            else
+                _oryginal = new Bitmap(image);
+            _result = new Bitmap(_oryginal);
+            processed = false;
         }
 
         public abstract void ToMainColors();
@@ -66,11 +89,11 @@ namespace RecruTaskOne
 
         public void SaveProcessed(string outputPath)
         {
-            if (processed == null)
+            if (!processed)
             {
                 throw new NotProcessedYetException();
             }
-            processed.Save(outputPath);
+            _result.Save(outputPath);
         }
     }
 
@@ -79,17 +102,17 @@ namespace RecruTaskOne
 
         public override void ToMainColors()
         {
-            if (oryginal == null)
+            if (_oryginal == null)
             {
                 throw new SourceImageNotFoundException();
             }
-            Bitmap source = new Bitmap(oryginal);
+            if (processed) return;
 
             unsafe
             {
-                BitmapData imageData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadWrite, source.PixelFormat);
+                BitmapData imageData = _result.LockBits(new Rectangle(0, 0, _result.Width, _result.Height), ImageLockMode.ReadWrite, _result.PixelFormat);
 
-                int bytesPerPixel = Image.GetPixelFormatSize(source.PixelFormat) / 8;
+                int bytesPerPixel = Image.GetPixelFormatSize(_result.PixelFormat) / 8;
                 int widthInBytes = imageData.Width * bytesPerPixel;
                 int heightInPixels = imageData.Height;
 
@@ -107,10 +130,9 @@ namespace RecruTaskOne
                             );
                     }
                 };
-                source.UnlockBits(imageData);
+                _result.UnlockBits(imageData);
+                processed = true;
             }
-
-            processed = source;
         }
 
     }
@@ -120,17 +142,17 @@ namespace RecruTaskOne
 
         public override void ToMainColors()
         {
-            if (oryginal == null)
+            if (_oryginal == null)
             {
                 throw new SourceImageNotFoundException();
             }
-            Bitmap source = new Bitmap(oryginal);
+            if (processed) return;
 
             unsafe
             {
-                BitmapData imageData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadWrite, source.PixelFormat);
+                BitmapData imageData = _result.LockBits(new Rectangle(0, 0, _result.Width, _result.Height), ImageLockMode.ReadWrite, _result.PixelFormat);
 
-                int bytesPerPixel = Image.GetPixelFormatSize(source.PixelFormat) / 8;
+                int bytesPerPixel = Image.GetPixelFormatSize(_result.PixelFormat) / 8;
                 int widthInBytes = imageData.Width * bytesPerPixel;
                 int heightInPixels = imageData.Height;
 
@@ -148,10 +170,9 @@ namespace RecruTaskOne
                             );
                     }
                 });
-                source.UnlockBits(imageData);
+                _result.UnlockBits(imageData);
+                processed = true;
             }
-
-            processed = source;
         }
 
     }

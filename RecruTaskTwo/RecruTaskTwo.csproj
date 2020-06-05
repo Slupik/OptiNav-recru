@@ -115,9 +115,9 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RecruTaskOne\RecruTaskOne.csproj">
+    <ProjectReference Include="..\RecruTaskOne\TaskLibrary.csproj">
       <Project>{D6E554C6-234E-41C8-B37E-21AF47324CA0}</Project>
-      <Name>RecruTaskOne</Name>
+      <Name>TaskLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
