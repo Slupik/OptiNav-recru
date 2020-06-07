@@ -8,6 +8,9 @@ namespace TaskLibrary
 
     public interface IImageProcessing
     {
+        Bitmap Oryginal { get;}
+        Bitmap Result { get;}
+
         void LoadImage(string path);
         void LoadImage(Image image);
 
