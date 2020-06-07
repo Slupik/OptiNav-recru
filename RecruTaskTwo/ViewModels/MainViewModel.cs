@@ -126,7 +126,10 @@ namespace RecruTaskTwo.ViewModels
         public async void LoadImage()
         {
             AllowToInteract = false;
-            OpenFileDialog openFileDialog = new OpenFileDialog();
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "Pliki graficzne (*.jpg, *.bmp, *.png) | *.jpg; *.bmp; *.png"
+            };
             if (openFileDialog.ShowDialog() == true)
             {
                 ImagePath = openFileDialog.FileName;
