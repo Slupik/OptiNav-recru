@@ -74,6 +74,7 @@
     </Compile>
     <Compile Include="Logic\ImageProcessingStrategy.cs" />
     <Compile Include="Models\ImageProcessingOutput.cs" />
+    <Compile Include="Utils\Dialogs.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\MainView.xaml.cs">

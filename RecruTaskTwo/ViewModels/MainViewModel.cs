@@ -6,6 +6,7 @@ using RecruTaskTwo.Utils;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using static RecruTaskTwo.Utils.FileChooser;
 
 namespace RecruTaskTwo.ViewModels
 {
@@ -13,10 +14,12 @@ namespace RecruTaskTwo.ViewModels
     {
         private static readonly BitmapImage EMPTY_IMAGE = new Bitmap(1, 1).ConvertToUiElement();
         private readonly ImageProcessingStrategy imageProcessor;
+        private readonly FileChooser fileChooser;
 
-        public MainViewModel(ImageProcessingStrategy imageProcessingStrategy)
+        public MainViewModel(ImageProcessingStrategy imageProcessingStrategy, FileChooser fileChooser)
         {
             imageProcessor = imageProcessingStrategy;
+            this.fileChooser = fileChooser;
         }
 
         private bool _timeInfoContainerIsVisible = false;
@@ -120,30 +123,27 @@ namespace RecruTaskTwo.ViewModels
             }
         }
 
-        public async void LoadImage()
+        public void LoadImage()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            fileChooser.GetFilePath(new Callback(OnFileSelect));
+        }
+
+        async void OnFileSelect(string path)
+        {
+            AllowToInteract = false;
+            TimeInfoContainerIsVisible = false;
+            ImagePath = path;
+            StateInformation = "Wczytywanie pliku...";
+
+            Bitmap result = await Task.Run(() =>
             {
-                Filter = "Pliki graficzne (*.jpg, *.bmp, *.png) | *.jpg; *.bmp; *.png"
-            };
-            if (openFileDialog.ShowDialog() == true)
-            {
-                AllowToInteract = false;
-                TimeInfoContainerIsVisible = false;
-                ImagePath = openFileDialog.FileName;
-                StateInformation = "Wczytywanie pliku...";
+                return imageProcessor.LoadImage(path);
+            });
 
-
-                Bitmap result = await Task.Run(() =>
-                {
-                    return imageProcessor.LoadImage(openFileDialog.FileName);
-                });
-
-                InputImage = result.ConvertToUiElement();
-                OutputImage = EMPTY_IMAGE;
-                ImageIsSelected = true;
-                AllowToInteract = true;
-            }
+            InputImage = result.ConvertToUiElement();
+            OutputImage = EMPTY_IMAGE;
+            ImageIsSelected = true;
+            AllowToInteract = true;
         }
 
         public void ProcessImageAsync()

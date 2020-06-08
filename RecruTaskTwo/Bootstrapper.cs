@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using RecruTaskTwo.Logic;
+using RecruTaskTwo.Utils;
 using RecruTaskTwo.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,10 @@ namespace RecruTaskTwo
                 var sync = IoC.Get<IImageProcessing>("sync");
                 var async = IoC.Get<IImageProcessing>("async");
                 return new ImageProcessingStrategy(sync, async);
+            });
+            _container.RegisterHandler(typeof(FileChooser), null, container =>
+            {
+                return new FileChooser("Pliki graficzne (*.jpg, *.bmp, *.png) | *.jpg; *.bmp; *.png");
             });
             _container.Singleton<MainViewModel>();
         }
