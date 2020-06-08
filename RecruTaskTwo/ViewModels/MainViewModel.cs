@@ -13,14 +13,18 @@ using System.Drawing;
 using System.Windows.Media.Imaging;
 using System.IO;
 using System.Drawing.Imaging;
+using RecruTaskTwo.Logic;
+using RecruTaskTwo.Models;
 
 namespace RecruTaskTwo.ViewModels
 {
     public class MainViewModel : Screen
     {
         private static readonly BitmapImage EMPTY_IMAGE = new Bitmap(1, 1).ConvertToUiElement();
-        private readonly IImageProcessing AsynchronousProcessor = new AsynchronousImageProcessing();
-        private readonly IImageProcessing SynchronousProcessor = new SynchronzousImageProcessing();
+        private readonly ImageProcessingStrategy imageProcessor = new ImageProcessingStrategy(
+            new SynchronzousImageProcessing(),
+            new AsynchronousImageProcessing()
+            );
 
         private bool _timeInfoContainerIsVisible = false;
         public bool TimeInfoContainerIsVisible
@@ -125,44 +129,55 @@ namespace RecruTaskTwo.ViewModels
 
         public async void LoadImage()
         {
-            AllowToInteract = false;
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Filter = "Pliki graficzne (*.jpg, *.bmp, *.png) | *.jpg; *.bmp; *.png"
             };
             if (openFileDialog.ShowDialog() == true)
             {
+                AllowToInteract = false;
+                TimeInfoContainerIsVisible = false;
                 ImagePath = openFileDialog.FileName;
                 StateInformation = "Wczytywanie pliku...";
-                await Task.Run(() =>
+
+
+                Bitmap result = await Task.Run(() =>
                 {
-                    SynchronousProcessor.LoadImage(openFileDialog.FileName);
+                    return imageProcessor.LoadImage(openFileDialog.FileName);
                 });
+
+                InputImage = result.ConvertToUiElement();
+                OutputImage = EMPTY_IMAGE;
                 ImageIsSelected = true;
                 AllowToInteract = true;
-                InputImage = SynchronousProcessor.Oryginal.ConvertToUiElement();
-                OutputImage = EMPTY_IMAGE;
             }
         }
 
-        public async void ProcessImage()
+        public void ProcessImageAsync()
+        {
+            imageProcessor.AsyncStrategy = true;
+            ProcessImage();
+        }
+
+        public void ProcessImageSync()
+        {
+            imageProcessor.AsyncStrategy = false;
+            ProcessImage();
+        }
+
+        private async void ProcessImage()
         {
             AllowToInteract = false;
-            StateInformation = "Przetwarzanie danych...";
-            await Task.Run(() =>
-            {
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
-                SynchronousProcessor.ToMainColors();
-                stopWatch.Stop();
 
-                TimeSpan ts = stopWatch.Elapsed;
-                ProcessingTime = String.Format("{0:00}:{1:00}:{2:00}.{3:000}",
-                    ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
+            ImageProcessingOutput result = await Task.Run(() =>
+            {
+                return imageProcessor.ProcessLoadedImage();
             });
+
+            ProcessingTime = result.ComputationTime;
             TimeInfoContainerIsVisible = true;
             AllowToInteract = true;
-            OutputImage = SynchronousProcessor.Result.ConvertToUiElement();
+            OutputImage = result.Image.ConvertToUiElement();
         }
     }
 }

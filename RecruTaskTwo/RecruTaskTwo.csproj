@@ -72,6 +72,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Logic\ImageProcessingStrategy.cs" />
+    <Compile Include="Models\ImageProcessingOutput.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\MainView.xaml.cs">
@@ -112,9 +114,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\RecruTaskOne\TaskLibrary.csproj">
       <Project>{D6E554C6-234E-41C8-B37E-21AF47324CA0}</Project>
