@@ -1,30 +1,23 @@
 ﻿using Caliburn.Micro;
 using Microsoft.Win32;
-using TaskLibrary;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using RecruTaskTwo.Utils;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Windows.Media.Imaging;
-using System.IO;
-using System.Drawing.Imaging;
 using RecruTaskTwo.Logic;
 using RecruTaskTwo.Models;
+using RecruTaskTwo.Utils;
+using System.Drawing;
+using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace RecruTaskTwo.ViewModels
 {
     public class MainViewModel : Screen
     {
         private static readonly BitmapImage EMPTY_IMAGE = new Bitmap(1, 1).ConvertToUiElement();
-        private readonly ImageProcessingStrategy imageProcessor = new ImageProcessingStrategy(
-            new SynchronzousImageProcessing(),
-            new AsynchronousImageProcessing()
-            );
+        private readonly ImageProcessingStrategy imageProcessor;
+
+        public MainViewModel(ImageProcessingStrategy imageProcessingStrategy)
+        {
+            imageProcessor = imageProcessingStrategy;
+        }
 
         private bool _timeInfoContainerIsVisible = false;
         public bool TimeInfoContainerIsVisible
