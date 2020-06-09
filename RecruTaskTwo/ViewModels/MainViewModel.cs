@@ -6,6 +6,7 @@ using RecruTaskTwo.Utils;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+//using static RecruTaskTwo.Logic.TaskExecutor<RecruTaskTwo.Models.ImageProcessingOutput>;
 using static RecruTaskTwo.Utils.FileChooser;
 
 namespace RecruTaskTwo.ViewModels
@@ -128,22 +129,34 @@ namespace RecruTaskTwo.ViewModels
             fileChooser.GetFilePath(new Callback(OnFileSelect));
         }
 
-        async void OnFileSelect(string path)
+        public void OnFileSelect(string path)
         {
-            AllowToInteract = false;
-            TimeInfoContainerIsVisible = false;
             ImagePath = path;
-            StateInformation = "Wczytywanie pliku...";
+            TimeInfoContainerIsVisible = false;
 
-            Bitmap result = await Task.Run(() =>
+            new TaskExecutor<Bitmap>(GetFileReadingTask(path))
+            {
+                StartCallback = new TaskExecutor<Bitmap>.OnStart(() =>
+                {
+                    AllowToInteract = false;
+                    StateInformation = "Wczytywanie pliku...";
+                }),
+                ResultCallback = new TaskExecutor<Bitmap>.OnResult(result =>
+                {
+                    InputImage = result.ConvertToUiElement(); ;
+                    OutputImage = EMPTY_IMAGE;
+                    ImageIsSelected = true;
+                    AllowToInteract = true;
+                })
+            }.Execute();
+        }
+
+        async Task<Bitmap> GetFileReadingTask(string path)
+        {
+            return await Task.Run(() =>
             {
                 return imageProcessor.LoadImage(path);
             });
-
-            InputImage = result.ConvertToUiElement();
-            OutputImage = EMPTY_IMAGE;
-            ImageIsSelected = true;
-            AllowToInteract = true;
         }
 
         public void ProcessImageAsync()
@@ -158,19 +171,30 @@ namespace RecruTaskTwo.ViewModels
             ProcessImage();
         }
 
-        private async void ProcessImage()
+        public void ProcessImage()
         {
-            AllowToInteract = false;
+            new TaskExecutor<ImageProcessingOutput>(GetProcessingTask())
+            {
+                StartCallback = new TaskExecutor<ImageProcessingOutput>.OnStart(() =>
+                {
+                    AllowToInteract = false;
+                }),
+                ResultCallback = new TaskExecutor<ImageProcessingOutput>.OnResult(result =>
+                {
+                    ProcessingTime = result.ComputationTime;
+                    TimeInfoContainerIsVisible = true;
+                    AllowToInteract = true;
+                    OutputImage = result.Image.ConvertToUiElement();
+                })
+            }.Execute();
+        }
 
-            ImageProcessingOutput result = await Task.Run(() =>
+        async Task<ImageProcessingOutput> GetProcessingTask()
+        {
+            return await Task.Run(() =>
             {
                 return imageProcessor.ProcessLoadedImage();
             });
-
-            ProcessingTime = result.ComputationTime;
-            TimeInfoContainerIsVisible = true;
-            AllowToInteract = true;
-            OutputImage = result.Image.ConvertToUiElement();
         }
     }
 }

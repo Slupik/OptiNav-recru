@@ -73,6 +73,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Logic\ImageProcessingStrategy.cs" />
+    <Compile Include="Utils\TaskExecutor.cs" />
     <Compile Include="Models\ImageProcessingOutput.cs" />
     <Compile Include="Utils\Dialogs.cs" />
     <Compile Include="Utils\Extensions.cs" />
