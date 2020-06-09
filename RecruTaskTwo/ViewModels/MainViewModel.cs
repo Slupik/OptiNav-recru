@@ -164,10 +164,7 @@ namespace RecruTaskTwo.ViewModels
             }
         }
 
-        public void LoadImage()
-        {
-            fileChooser.GetFilePath(new Callback(OnFileSelect));
-        }
+        public void LoadImage() => fileChooser.GetFilePath(new Callback(OnFileSelect));
 
         public void OnFileSelect(string path)
         {
@@ -196,10 +193,7 @@ namespace RecruTaskTwo.ViewModels
             ProcessImage();
         }
 
-        public void ProcessImage()
-        {
-            imageProcessingExecutor.Execute(GetProcessingTask());
-        }
+        public void ProcessImage() => imageProcessingExecutor.Execute(GetProcessingTask());
 
         async Task<ImageProcessingOutput> GetProcessingTask()
         {
