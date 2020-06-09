@@ -17,7 +17,7 @@ namespace RecruTaskTwo.ViewModels
         private readonly ImageProcessingStrategy imageProcessor;
         private readonly FileChooser fileChooser;
 
-        public MainViewModel(ImageProcessingStrategy imageProcessingStrategy, FileChooser fileChooser)
+        public MainViewModel(ImageProcessingStrategy imageProcessingStrategy, ImageFilesChooser fileChooser)
         {
             imageProcessor = imageProcessingStrategy;
             this.fileChooser = fileChooser;

@@ -37,10 +37,7 @@ namespace RecruTaskTwo
                 var async = IoC.Get<IImageProcessing>("async");
                 return new ImageProcessingStrategy(sync, async);
             });
-            _container.RegisterHandler(typeof(FileChooser), null, container =>
-            {
-                return new FileChooser("Pliki graficzne (*.jpg, *.bmp, *.png) | *.jpg; *.bmp; *.png");
-            });
+            _container.PerRequest<ImageFilesChooser>();
             _container.Singleton<MainViewModel>();
         }
 

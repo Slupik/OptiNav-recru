@@ -30,4 +30,14 @@ namespace RecruTaskTwo.Utils
         }
 
     }
+
+    public sealed class ImageFilesChooser : FileChooser
+    {
+        public ImageFilesChooser() : base("Pliki graficzne (*.jpg, *.bmp, *.png) | *.jpg; *.bmp; *.png")
+        {
+
+        }
+
+    }
+
 }
