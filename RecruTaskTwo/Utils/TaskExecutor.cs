@@ -28,16 +28,15 @@ namespace RecruTaskTwo.Logic
             }
         }
 
-        public TaskExecutor(Task<TResult> task)
+        public void Execute(Task<TResult> task)
         {
-            Task = task;
-        }
-
-        public void Execute()
-        {
-            if (!Task.IsCompleted)
+            if (Task == null || Task.IsCompleted)
             {
-                var _ = WatchTaskAsync(Task);
+                Task = task;
+                if (!task.IsCompleted)
+                {
+                    var _ = WatchTaskAsync(Task);
+                }
             }
         }
 

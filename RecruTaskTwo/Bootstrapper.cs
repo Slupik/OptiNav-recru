@@ -1,9 +1,11 @@
 ﻿using Caliburn.Micro;
 using RecruTaskTwo.Logic;
+using RecruTaskTwo.Models;
 using RecruTaskTwo.Utils;
 using RecruTaskTwo.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +31,8 @@ namespace RecruTaskTwo
         protected override void Configure()
         {
             _container.Singleton<IWindowManager, WindowManager>();
+            _container.PerRequest<TaskExecutor<Bitmap>>();
+            _container.PerRequest<TaskExecutor<ImageProcessingOutput>>();
             _container.RegisterSingleton(typeof(IImageProcessing), "sync", typeof(SynchronzousImageProcessing));
             _container.RegisterSingleton(typeof(IImageProcessing), "async", typeof(AsynchronousImageProcessing));
             _container.RegisterHandler(typeof(ImageProcessingStrategy), null, container =>

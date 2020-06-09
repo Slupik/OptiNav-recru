@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using RecruTaskTwo.Logic;
 using RecruTaskTwo.Models;
 using RecruTaskTwo.Utils;
+using System;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
@@ -16,11 +17,50 @@ namespace RecruTaskTwo.ViewModels
         private static readonly BitmapImage EMPTY_IMAGE = new Bitmap(1, 1).ConvertToUiElement();
         private readonly ImageProcessingStrategy imageProcessor;
         private readonly FileChooser fileChooser;
+        private readonly TaskExecutor<Bitmap> imageLoadingExecutor;
+        private readonly TaskExecutor<ImageProcessingOutput> imageProcessingExecutor;
 
-        public MainViewModel(ImageProcessingStrategy imageProcessingStrategy, ImageFilesChooser fileChooser)
+        public MainViewModel(ImageProcessingStrategy imageProcessingStrategy, ImageFilesChooser fileChooser, TaskExecutor<Bitmap> imageLoadingExecutor,
+            TaskExecutor<ImageProcessingOutput> imageProcessingExecutor)
         {
             imageProcessor = imageProcessingStrategy;
             this.fileChooser = fileChooser;
+            this.imageLoadingExecutor = imageLoadingExecutor;
+            this.imageProcessingExecutor = imageProcessingExecutor;
+
+            SetupImageLoadingExecutor();
+            SetupImageProcessingExecutor();
+        }
+
+        private void SetupImageLoadingExecutor()
+        {
+            imageLoadingExecutor.StartCallback = new TaskExecutor<Bitmap>.OnStart(() =>
+            {
+                AllowToInteract = false;
+                StateInformation = "Wczytywanie pliku...";
+            });
+            imageLoadingExecutor.ResultCallback = new TaskExecutor<Bitmap>.OnResult(result =>
+            {
+                InputImage = result.ConvertToUiElement(); ;
+                OutputImage = EMPTY_IMAGE;
+                ImageIsSelected = true;
+                AllowToInteract = true;
+            });
+        }
+
+        private void SetupImageProcessingExecutor()
+        {
+            imageProcessingExecutor.StartCallback = new TaskExecutor<ImageProcessingOutput>.OnStart(() =>
+            {
+                AllowToInteract = false;
+            });
+            imageProcessingExecutor.ResultCallback = new TaskExecutor<ImageProcessingOutput>.OnResult(result =>
+            {
+                ProcessingTime = result.ComputationTime;
+                TimeInfoContainerIsVisible = true;
+                AllowToInteract = true;
+                OutputImage = result.Image.ConvertToUiElement();
+            });
         }
 
         private bool _timeInfoContainerIsVisible = false;
@@ -133,22 +173,7 @@ namespace RecruTaskTwo.ViewModels
         {
             ImagePath = path;
             TimeInfoContainerIsVisible = false;
-
-            new TaskExecutor<Bitmap>(GetFileReadingTask(path))
-            {
-                StartCallback = new TaskExecutor<Bitmap>.OnStart(() =>
-                {
-                    AllowToInteract = false;
-                    StateInformation = "Wczytywanie pliku...";
-                }),
-                ResultCallback = new TaskExecutor<Bitmap>.OnResult(result =>
-                {
-                    InputImage = result.ConvertToUiElement(); ;
-                    OutputImage = EMPTY_IMAGE;
-                    ImageIsSelected = true;
-                    AllowToInteract = true;
-                })
-            }.Execute();
+            imageLoadingExecutor.Execute(GetFileReadingTask(path));
         }
 
         async Task<Bitmap> GetFileReadingTask(string path)
@@ -173,20 +198,7 @@ namespace RecruTaskTwo.ViewModels
 
         public void ProcessImage()
         {
-            new TaskExecutor<ImageProcessingOutput>(GetProcessingTask())
-            {
-                StartCallback = new TaskExecutor<ImageProcessingOutput>.OnStart(() =>
-                {
-                    AllowToInteract = false;
-                }),
-                ResultCallback = new TaskExecutor<ImageProcessingOutput>.OnResult(result =>
-                {
-                    ProcessingTime = result.ComputationTime;
-                    TimeInfoContainerIsVisible = true;
-                    AllowToInteract = true;
-                    OutputImage = result.Image.ConvertToUiElement();
-                })
-            }.Execute();
+            imageProcessingExecutor.Execute(GetProcessingTask());
         }
 
         async Task<ImageProcessingOutput> GetProcessingTask()
