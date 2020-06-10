@@ -14,11 +14,11 @@ namespace TaskLibrary.Tests
     {
 
         [TestMethod()]
-        public void AsyncProcess_OnlyRed_MaxRed()
+        public void AsyncProcess_MostRed_MaxRed()
         {
             ImageProcessing sut = GetSut();
             Bitmap input = new Bitmap(1, 1);
-            input.SetPixel(0, 0, Color.FromArgb(255, 200, 0, 0));
+            input.SetPixel(0, 0, Color.FromArgb(255, 200, 3, 4));
             sut.LoadImage(input);
 
             sut.ToMainColors();
@@ -27,11 +27,11 @@ namespace TaskLibrary.Tests
         }
 
         [TestMethod()]
-        public void AsyncProcess_OnlyGreen_MaxGreen()
+        public void AsyncProcess_MostGreen_MaxGreen()
         {
             ImageProcessing sut = GetSut();
             Bitmap input = new Bitmap(1, 1);
-            input.SetPixel(0, 0, Color.FromArgb(255, 0, 200, 0));
+            input.SetPixel(0, 0, Color.FromArgb(255, 3, 200, 4));
             sut.LoadImage(input);
 
             sut.ToMainColors();
@@ -40,16 +40,68 @@ namespace TaskLibrary.Tests
         }
 
         [TestMethod()]
-        public void AsyncProcess_OnlyBlue_MaxBlue()
+        public void AsyncProcess_MostBlue_MaxBlue()
         {
             ImageProcessing sut = GetSut();
             Bitmap input = new Bitmap(1, 1);
-            input.SetPixel(0, 0, Color.FromArgb(255, 0, 0, 200));
+            input.SetPixel(0, 0, Color.FromArgb(255, 3, 4, 200));
             sut.LoadImage(input);
 
             sut.ToMainColors();
 
             Assert.AreEqual(Color.FromArgb(255, 0, 0, 255), sut.Result.GetPixel(0, 0));
+        }
+
+        [TestMethod()]
+        public void AsyncProcess_AllColorsEqual_MaxRed()
+        {
+            ImageProcessing sut = GetSut();
+            Bitmap input = new Bitmap(1, 1);
+            input.SetPixel(0, 0, Color.FromArgb(255, 200, 200, 200));
+            sut.LoadImage(input);
+
+            sut.ToMainColors();
+
+            Assert.AreEqual(Color.FromArgb(255, 255, 0, 0), sut.Result.GetPixel(0, 0));
+        }
+
+        [TestMethod()]
+        public void AsyncProcess_RedAndGeenEqual_MaxRed()
+        {
+            ImageProcessing sut = GetSut();
+            Bitmap input = new Bitmap(1, 1);
+            input.SetPixel(0, 0, Color.FromArgb(255, 200, 200, 0));
+            sut.LoadImage(input);
+
+            sut.ToMainColors();
+
+            Assert.AreEqual(Color.FromArgb(255, 255, 0, 0), sut.Result.GetPixel(0, 0));
+        }
+
+        [TestMethod()]
+        public void AsyncProcess_RedAndBlueEqual_MaxRed()
+        {
+            ImageProcessing sut = GetSut();
+            Bitmap input = new Bitmap(1, 1);
+            input.SetPixel(0, 0, Color.FromArgb(255, 200, 0, 200));
+            sut.LoadImage(input);
+
+            sut.ToMainColors();
+
+            Assert.AreEqual(Color.FromArgb(255, 255, 0, 0), sut.Result.GetPixel(0, 0));
+        }
+
+        [TestMethod()]
+        public void AsyncProcess_GreenAndBlueEqual_MaxGreen()
+        {
+            ImageProcessing sut = GetSut();
+            Bitmap input = new Bitmap(1, 1);
+            input.SetPixel(0, 0, Color.FromArgb(255, 0, 200, 200));
+            sut.LoadImage(input);
+
+            sut.ToMainColors();
+
+            Assert.AreEqual(Color.FromArgb(255, 0, 255, 0), sut.Result.GetPixel(0, 0));
         }
 
         [TestMethod()]
