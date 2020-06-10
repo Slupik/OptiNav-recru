@@ -57,16 +57,6 @@ namespace RecruTaskTwo.Logic
             return new ImageProcessingOutput(strategy.Result, ts);
         }
 
-        private IImageProcessing GetStrategy()
-        {
-            if (AsyncStrategy)
-            {
-                return Async;
-            }
-            else
-            {
-                return Sync;
-            }
-        }
+        private IImageProcessing GetStrategy() => AsyncStrategy? Async : Sync;
     }
 }
