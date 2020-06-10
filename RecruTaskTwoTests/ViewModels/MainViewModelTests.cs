@@ -87,7 +87,7 @@ namespace RecruTaskTwo.ViewModels.Tests
                 });
             Startup();
             imageLoadingExecutor.Setup(executor => executor.Execute(It.IsAny<Task<Bitmap>>()))
-                .Callback(()=>
+                .Callback(() =>
                 {
                     startCallback();
                 });
@@ -123,6 +123,97 @@ namespace RecruTaskTwo.ViewModels.Tests
             Assert.IsTrue(EMPTY_IMAGE.IsEqual(sut.OutputImage));
             Assert.IsTrue(loadedImage.ConvertToUiElement().IsEqual(sut.InputImage));
             Assert.AreEqual(true, sut.ImageIsSelected);
+            Assert.AreEqual(true, sut.AllowToInteract);
+        }
+
+        [TestMethod()]
+        public void ProcessImageAsync_SelectAsyncStrategy()
+        {
+            imageProcessingExecutor.Setup(executor => executor.Execute(It.IsAny<Task<ImageProcessingOutput>>())).Verifiable();
+
+            sut.ProcessImageAsync();
+
+            imageProcessingStrategy.VerifySet(strategy => strategy.AsyncStrategy = true, Times.Once());
+        }
+
+        [TestMethod()]
+        public void ProcessImage_SelectSyncStrategy()
+        {
+            imageProcessingExecutor.Setup(executor => executor.Execute(It.IsAny<Task<ImageProcessingOutput>>())).Verifiable();
+
+            sut.ProcessImageSync();
+
+            imageProcessingStrategy.VerifySet(strategy => strategy.AsyncStrategy = false, Times.Once());
+        }
+
+        [TestMethod()]
+        public void ProcessImageAsync_RunAsyncStrategy()
+        {
+            imageProcessingExecutor.Setup(executor => executor.Execute(It.IsAny<Task<ImageProcessingOutput>>())).Verifiable();
+
+            sut.ProcessImageAsync();
+
+            imageProcessingExecutor.Verify(executor => executor.Execute(It.IsAny<Task<ImageProcessingOutput>>()), Times.Once());
+        }
+
+        [TestMethod()]
+        public void ProcessImage_RunSyncStrategy()
+        {
+            imageProcessingExecutor.Setup(executor => executor.Execute(It.IsAny<Task<ImageProcessingOutput>>())).Verifiable();
+
+            sut.ProcessImageSync();
+
+            imageProcessingExecutor.Verify(executor => executor.Execute(It.IsAny<Task<ImageProcessingOutput>>()), Times.Once());
+        }
+
+        [TestMethod()]
+        public void ProcessImage_ShowProcessingState()
+        {
+            Action startCallback = () => Assert.Fail();
+            imageProcessingExecutor.Setup(executor => executor.SetOnStart(It.IsAny<Action>()))
+                .Callback<Action>(c => startCallback = c);
+            Startup();
+            Bitmap loadedImage = new Bitmap(2, 2);
+            imageProcessingExecutor.Setup(executor => executor.Execute(It.IsAny<Task<ImageProcessingOutput>>()))
+                .Callback(() =>
+                {
+                    startCallback();
+                });
+
+            sut.ProcessImageSync();
+
+            Assert.AreEqual("Przetwarzanie zdjęcia...", sut.StateInformation);
+            Assert.AreEqual(false, sut.AllowToInteract);
+        }
+
+        [TestMethod()]
+        public void ProcessImage_ShowProcessingOutput()
+        {
+            Action startCallback = () => Assert.Fail();
+            imageProcessingExecutor.Setup(executor => executor.SetOnStart(It.IsAny<Action>()))
+                .Callback<Action>(c => startCallback = c);
+            Action<ImageProcessingOutput> resultCallback = (_) => Assert.Fail();
+            imageProcessingExecutor.Setup(executor => executor.SetOnResult(It.IsAny<Action<ImageProcessingOutput>>()))
+                .Callback<Action<ImageProcessingOutput>>(c => resultCallback = c);
+            Startup();
+            Bitmap outputImage = new Bitmap(2, 2);
+            TimeSpan processingTime = new TimeSpan(0, 0, 0, 0, 1);
+            ImageProcessingOutput output = new ImageProcessingOutput(
+                                                outputImage,
+                                                processingTime
+                                            );
+            imageProcessingExecutor.Setup(executor => executor.Execute(It.IsAny<Task<ImageProcessingOutput>>()))
+                .Callback(() =>
+                {
+                    startCallback();
+                    resultCallback(output);
+                });
+
+            sut.ProcessImageSync();
+
+            Assert.IsTrue(outputImage.ConvertToUiElement().IsEqual(sut.OutputImage));
+            Assert.AreEqual("00:00:00.001", sut.ProcessingTime);
+            Assert.AreEqual(true, sut.TimeInfoContainerIsVisible);
             Assert.AreEqual(true, sut.AllowToInteract);
         }
     }

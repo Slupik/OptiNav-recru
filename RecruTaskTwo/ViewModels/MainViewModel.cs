@@ -41,7 +41,7 @@ namespace RecruTaskTwo.ViewModels
             });
             imageLoadingExecutor.SetOnResult(result =>
             {
-                InputImage = result.ConvertToUiElement(); ;
+                InputImage = result.ConvertToUiElement();
                 OutputImage = EMPTY_IMAGE;
                 ImageIsSelected = true;
                 AllowToInteract = true;
@@ -52,6 +52,7 @@ namespace RecruTaskTwo.ViewModels
         {
             imageProcessingExecutor.SetOnStart(() =>
             {
+                StateInformation = "Przetwarzanie zdjęcia...";
                 AllowToInteract = false;
             });
             imageProcessingExecutor.SetOnResult(result =>
@@ -193,7 +194,7 @@ namespace RecruTaskTwo.ViewModels
             ProcessImage();
         }
 
-        public void ProcessImage() => imageProcessingExecutor.Execute(GetProcessingTask());
+        private void ProcessImage() => imageProcessingExecutor.Execute(GetProcessingTask());
 
         private async Task<ImageProcessingOutput> GetProcessingTask()
         {
