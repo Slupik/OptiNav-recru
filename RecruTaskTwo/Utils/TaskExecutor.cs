@@ -9,18 +9,24 @@ using System.Threading.Tasks;
 namespace RecruTaskTwo.Logic
 {
 
-    public class TaskExecutor<TResult>
+    public interface ITaskExecutor<TResult>
     {
-        public delegate void OnStart();
-        public delegate void OnResult(TResult output);
-        public delegate void OnError();
+        Task<TResult> Task { get; }
 
-        public OnStart StartCallback;
-        public OnResult ResultCallback;
-        public OnError ErrorCallback;
+        void SetOnStart(Action callback);
+        void SetOnResult(Action<TResult> callback);
+        void SetOnError(Action callback);
+        void Execute(Task<TResult> task);
+    }
+
+    public class TaskExecutor<TResult> : ITaskExecutor<TResult>
+    {
+        public Action StartCallback;
+        public Action<TResult> ResultCallback;
+        public Action ErrorCallback;
 
         public Task<TResult> Task { get; private set; }
-        public TResult Result
+        private TResult Result
         {
             get
             {
@@ -38,6 +44,21 @@ namespace RecruTaskTwo.Logic
                     var _ = WatchTaskAsync(Task);
                 }
             }
+        }
+
+        public void SetOnError(Action callback)
+        {
+            ErrorCallback = callback;
+        }
+
+        public void SetOnResult(Action<TResult> callback)
+        {
+            ResultCallback = callback;
+        }
+
+        public void SetOnStart(Action callback)
+        {
+            StartCallback = callback;
         }
 
         private async Task WatchTaskAsync(Task task)

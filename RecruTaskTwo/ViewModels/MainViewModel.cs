@@ -15,13 +15,13 @@ namespace RecruTaskTwo.ViewModels
     public class MainViewModel : Screen
     {
         private static readonly BitmapImage EMPTY_IMAGE = new Bitmap(1, 1).ConvertToUiElement();
-        private readonly ImageProcessingStrategy imageProcessor;
-        private readonly FileChooser fileChooser;
-        private readonly TaskExecutor<Bitmap> imageLoadingExecutor;
-        private readonly TaskExecutor<ImageProcessingOutput> imageProcessingExecutor;
+        private readonly IImageProcessingStrategy imageProcessor;
+        private readonly IFileChooser fileChooser;
+        private readonly ITaskExecutor<Bitmap> imageLoadingExecutor;
+        private readonly ITaskExecutor<ImageProcessingOutput> imageProcessingExecutor;
 
-        public MainViewModel(ImageProcessingStrategy imageProcessingStrategy, ImageFilesChooser fileChooser, TaskExecutor<Bitmap> imageLoadingExecutor,
-            TaskExecutor<ImageProcessingOutput> imageProcessingExecutor)
+        public MainViewModel(IImageProcessingStrategy imageProcessingStrategy, IFileChooser fileChooser, ITaskExecutor<Bitmap> imageLoadingExecutor,
+            ITaskExecutor<ImageProcessingOutput> imageProcessingExecutor)
         {
             imageProcessor = imageProcessingStrategy;
             this.fileChooser = fileChooser;
@@ -34,12 +34,12 @@ namespace RecruTaskTwo.ViewModels
 
         private void SetupImageLoadingExecutor()
         {
-            imageLoadingExecutor.StartCallback = new TaskExecutor<Bitmap>.OnStart(() =>
+            imageLoadingExecutor.SetOnStart(() =>
             {
                 AllowToInteract = false;
                 StateInformation = "Wczytywanie pliku...";
             });
-            imageLoadingExecutor.ResultCallback = new TaskExecutor<Bitmap>.OnResult(result =>
+            imageLoadingExecutor.SetOnResult(result =>
             {
                 InputImage = result.ConvertToUiElement(); ;
                 OutputImage = EMPTY_IMAGE;
@@ -50,11 +50,11 @@ namespace RecruTaskTwo.ViewModels
 
         private void SetupImageProcessingExecutor()
         {
-            imageProcessingExecutor.StartCallback = new TaskExecutor<ImageProcessingOutput>.OnStart(() =>
+            imageProcessingExecutor.SetOnStart(() =>
             {
                 AllowToInteract = false;
             });
-            imageProcessingExecutor.ResultCallback = new TaskExecutor<ImageProcessingOutput>.OnResult(result =>
+            imageProcessingExecutor.SetOnResult(result =>
             {
                 ProcessingTime = result.ComputationTime;
                 TimeInfoContainerIsVisible = true;
@@ -173,7 +173,7 @@ namespace RecruTaskTwo.ViewModels
             imageLoadingExecutor.Execute(GetFileReadingTask(path));
         }
 
-        async Task<Bitmap> GetFileReadingTask(string path)
+        private async Task<Bitmap> GetFileReadingTask(string path)
         {
             return await Task.Run(() =>
             {
@@ -195,7 +195,7 @@ namespace RecruTaskTwo.ViewModels
 
         public void ProcessImage() => imageProcessingExecutor.Execute(GetProcessingTask());
 
-        async Task<ImageProcessingOutput> GetProcessingTask()
+        private async Task<ImageProcessingOutput> GetProcessingTask()
         {
             return await Task.Run(() =>
             {

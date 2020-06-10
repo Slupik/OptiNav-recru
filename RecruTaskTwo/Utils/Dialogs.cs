@@ -7,10 +7,15 @@ using System.Threading.Tasks;
 
 namespace RecruTaskTwo.Utils
 {
-    public class FileChooser
-    {
+    public delegate void Callback(String path);
 
-        public delegate void Callback(String path);
+    public interface IFileChooser
+    {
+        void GetFilePath(Callback callback);
+    }
+
+    public class FileChooser : IFileChooser
+    {
         private readonly OpenFileDialog OpenFileDialog;
 
         public FileChooser(string filter)
@@ -31,7 +36,7 @@ namespace RecruTaskTwo.Utils
 
     }
 
-    public sealed class ImageFilesChooser : FileChooser
+    public class ImageFilesChooser : FileChooser
     {
         public ImageFilesChooser() : base("Pliki graficzne (*.jpg, *.bmp, *.png) | *.jpg; *.bmp; *.png")
         {

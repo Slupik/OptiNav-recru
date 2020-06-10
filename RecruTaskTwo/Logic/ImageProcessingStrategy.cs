@@ -6,7 +6,16 @@ using TaskLibrary;
 
 namespace RecruTaskTwo.Logic
 {
-    public class ImageProcessingStrategy
+
+    public interface IImageProcessingStrategy
+    {
+        bool AsyncStrategy { get; set; }
+
+        Bitmap LoadImage(String path);
+        ImageProcessingOutput ProcessLoadedImage();
+    }
+
+    public class ImageProcessingStrategy : IImageProcessingStrategy
     {
         private IImageProcessing Sync { get; }
         private IImageProcessing Async { get; }
